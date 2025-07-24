@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: gro-mart-backend
+    env: node
+    plan: free
+    buildCommand: "cd server && npm install"
+    startCommand: "cd server && npm start"
+    envVars:
+      - key: RESEND_API_KEY
+        sync: false
+
+  - type: static
+    name: gro-mart-frontend
+    buildCommand: "cd client && npm install && npm run build"
+    publishPath: "client/build"
+    envVars:
+      - key: REACT_APP_API_URL
+        value: "https://gro-mart-backend.onrender.com"
