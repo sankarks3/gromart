@@ -12,9 +12,16 @@ const Checkout: React.FC = () => {
   });
   const navigate = useNavigate();
 
-  const totalAmount = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const totalAmount = Array.isArray(cartItems)
+    ? cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
+    : 0;
 
   const handlePlaceOrder = async () => {
+    if (!customerDetails.name || !customerDetails.phone || !customerDetails.address) {
+      alert('Please fill all customer details before placing order.');
+      return;
+    }
+
     const orderId = `GRM${Date.now()}`;
     const orderDetails = {
       ...customerDetails,
@@ -24,7 +31,6 @@ const Checkout: React.FC = () => {
       orderId,
     };
 
-    // Call backend API to send confirmation email
     try {
       await fetch('https://gromart-i3hs.onrender.com/api/send-email', {
         method: 'POST',
@@ -40,6 +46,7 @@ const Checkout: React.FC = () => {
       }
     } catch (error) {
       console.error('Order email failed:', error);
+      alert('Failed to place order. Please try again.');
     }
   };
 
@@ -48,32 +55,48 @@ const Checkout: React.FC = () => {
     window.location.href = upiLink;
   };
 
+  if (!Array.isArray(cartItems) || cartItems.length === 0) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Your cart is empty.</div>;
+  }
+
   return (
-    <div className="checkout-container">
+    <div className="checkout-container" style={{ padding: '2rem', maxWidth: '500px', margin: '0 auto' }}>
       <h2>Checkout</h2>
       <input
         type="text"
         placeholder="Name"
         value={customerDetails.name}
         onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })}
+        style={{ width: '100%', marginBottom: '10px', padding: '10px' }}
       />
       <input
         type="text"
         placeholder="Phone"
         value={customerDetails.phone}
         onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
+        style={{ width: '100%', marginBottom: '10px', padding: '10px' }}
       />
       <textarea
         placeholder="Address"
         value={customerDetails.address}
         onChange={(e) => setCustomerDetails({ ...customerDetails, address: e.target.value })}
+        style={{ width: '100%', marginBottom: '10px', padding: '10px' }}
       />
-      <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+      <select
+        value={paymentMethod}
+        onChange={(e) => setPaymentMethod(e.target.value)}
+        style={{ width: '100%', marginBottom: '10px', padding: '10px' }}
+      >
         <option value="COD">Cash on Delivery</option>
         <option value="UPI">UPI Payment</option>
       </select>
 
-      <button onClick={handlePlaceOrder}>
+      <p><strong>Total:</strong> ₹{totalAmount}</p>
+
+      <button
+        onClick={handlePlaceOrder}
+        style={{ width: '100%', padding: '12px', background: '#28a745', color: '#fff', border: 'none', cursor: 'pointer' }}
+      >
         Place Order
       </button>
     </div>
