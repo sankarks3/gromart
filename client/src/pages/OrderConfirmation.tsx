@@ -1,51 +1,36 @@
-// client/src/pages/OrderConfirmation.tsx
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 
 export default function OrderConfirmation() {
   const location = useLocation();
-  const navigate = useNavigate();
   const orderDetails = location.state?.orderDetails;
 
   if (!orderDetails) {
     return (
-      <div className="text-center mt-10">
-        <p>No order found.</p>
-        <button
-          onClick={() => navigate('/')}
-          className="mt-4 px-4 py-2 bg-green-600 text-white rounded"
-        >
-          Back to Home
-        </button>
+      <div className="text-center p-6">
+        <h2 className="text-xl font-semibold mb-2">No Order Found</h2>
+        <p className="text-gray-600 mb-4">Please complete your order before accessing this page.</p>
+        <Link to="/" className="text-green-600 underline">Back to Home</Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 text-center">
-      <CheckCircle className="text-green-600 w-16 h-16 mx-auto mb-4" />
-      <h1 className="text-2xl font-bold mb-2 text-green-700">Order Received Successfully!</h1>
-      <p className="mb-6">Thank you for your order. We'll process it shortly.</p>
+    <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
+      <CheckCircle className="text-green-600 w-16 h-16 mb-4" />
+      <h2 className="text-2xl font-bold mb-2">Order Received Successfully</h2>
+      <p className="text-gray-700 mb-4">Thank you, {orderDetails.customer?.name || 'Customer'}!</p>
 
-      <div className="text-left bg-white shadow rounded p-4">
-        <h2 className="font-semibold mb-2">Order Summary</h2>
+      <div className="bg-gray-100 rounded p-4 text-left w-full max-w-md mb-4">
         <p><strong>Order ID:</strong> {orderDetails.orderId}</p>
-        <p><strong>Name:</strong> {orderDetails.customer.name}</p>
-        <p><strong>Phone:</strong> {orderDetails.customer.phone}</p>
-        <p><strong>Address:</strong> {orderDetails.customer.address}</p>
-
-        <h3 className="mt-4 mb-2 font-semibold">Items:</h3>
-        <ul className="list-disc pl-5">
-          {orderDetails.items.map((item: any, index: number) => (
-            <li key={index}>
-              {item.name} - Qty: {item.quantity} - ₹{item.price * item.quantity}
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-3 font-bold">Total: ₹{orderDetails.totalAmount}</p>
+        <p><strong>Total:</strong> ₹{orderDetails.totalAmount}</p>
+        <p><strong>Payment:</strong> {orderDetails.paymentMethod}</p>
       </div>
+
+      <Link to="/" className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+        Back to Home
+      </Link>
     </div>
   );
 }
