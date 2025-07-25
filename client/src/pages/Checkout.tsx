@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import QRCode from 'qrcode.react';
 
 const Checkout: React.FC = () => {
   const { items, clearCart } = useCart();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('UPI');
+  const [showQR, setShowQR] = useState(false);
   const [customerDetails, setCustomerDetails] = useState({
     name: '',
     phone: '',
@@ -17,9 +19,10 @@ const Checkout: React.FC = () => {
     0
   );
 
-  const handlePlaceOrder = async () => {
-    const orderId = `GRM${Date.now()}`;
+  const orderId = `GRM${Date.now()}`;
+  const upiUrl = `upi://pay?pa=ks.sankar@ybl&pn=GROMART&am=${totalAmount}&cu=INR&tn=Order%20${orderId}`;
 
+  const handlePlaceOrder = async () => {
     const orderDetails = {
       orderId,
       customer: customerDetails,
@@ -41,16 +44,29 @@ const Checkout: React.FC = () => {
       }
 
       if (paymentMethod === 'UPI') {
-        const upiUrl = `upi://pay?pa=ks.sankar@ybl&pn=GROMART&am=${totalAmount}&cu=INR&tn=Order%20${orderId}`;
-        window.location.href = upiUrl;
+        if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+          window.location.href = upiUrl;
+        } else {
+          setShowQR(true);
+        }
+      } else {
+        clearCart();
+        navigate('/order-confirmation', { state: { orderDetails } });
       }
-
-      clearCart();
-      navigate('/order-confirmation', { state: { orderDetails } });
     } catch (err) {
       console.error('Order placement failed:', err);
     }
   };
+
+  useEffect(() => {
+    if (showQR) {
+      const interval = setInterval(() => {
+        // Add verification logic if needed
+        console.log('Waiting for payment confirmation...');
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [showQR]);
 
   return (
     <div className="checkout-container p-4 max-w-xl mx-auto">
@@ -89,19 +105,25 @@ const Checkout: React.FC = () => {
         className="w-full mb-3 p-2 border rounded"
       >
         <option value="UPI">UPI (PhonePe / GPay)</option>
-        <option value="COD" disabled>Cash on Delivery (Coming Soon)</option>
+        <option value="COD" disabled>
+          Cash on Delivery (Coming Soon)
+        </option>
       </select>
-
-      <div className="summary mb-4">
-        <h3 className="font-semibold">Total: ₹{totalAmount}</h3>
-      </div>
 
       <button
         onClick={handlePlaceOrder}
-        className="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700"
+        className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700"
       >
         Place Order
       </button>
+
+      {showQR && (
+        <div className="mt-6 text-center">
+          <h3 className="text-lg font-semibold mb-2">Scan to Pay</h3>
+          <QRCode value={upiUrl} size={200} />
+          <p className="text-sm text-gray-600 mt-2">{upiUrl}</p>
+        </div>
+      )}
     </div>
   );
 };
