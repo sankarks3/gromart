@@ -9,10 +9,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- CORS Configuration ---
+// CORS setup - allows Render frontend or localhost during development
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Allow your frontend domain
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
   })
@@ -23,18 +23,17 @@ app.use(bodyParser.json());
 // Initialize Resend
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Health Check
+// Health check route
 app.get('/', (req, res) => {
   res.json({ message: 'Backend is working!' });
 });
 
-// Email API Endpoint
+// Email API
 app.post('/api/send-email', async (req, res) => {
   console.log('Received order:', req.body);
 
-  const { customer, items, totalAmount, paymentMode, orderId } = req.body;
+  const { customer, items, totalAmount, orderId } = req.body;
 
-  // Product list HTML
   const productListHtml =
     items && items.length > 0
       ? items
@@ -45,7 +44,6 @@ app.post('/api/send-email', async (req, res) => {
           .join('')
       : '<li>No products found</li>';
 
-  // Email body HTML
   const emailBodyHtml = `
     <h2>New Order Details</h2>
     <p><strong>Order ID:</strong> ${orderId}</p>
@@ -55,7 +53,6 @@ app.post('/api/send-email', async (req, res) => {
     <h3>Products:</h3>
     <ul>${productListHtml}</ul>
     <p><strong>Total Amount:</strong> ₹${totalAmount || 0}</p>
-    <p><strong>Payment Mode:</strong> ${paymentMode || 'unknown'}</p>
   `;
 
   try {
@@ -74,7 +71,7 @@ app.post('/api/send-email', async (req, res) => {
   }
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
