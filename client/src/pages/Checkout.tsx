@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
-import QRCode from 'qrcode.react';
+import { QRCode } from 'react-qrcode-logo';
 
 const Checkout: React.FC = () => {
   const { items, clearCart } = useCart();
