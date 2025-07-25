@@ -41,7 +41,6 @@ const Checkout: React.FC = () => {
       }
 
       if (paymentMethod === 'UPI') {
-        // Open UPI payment intent
         const upiUrl = `upi://pay?pa=ks.sankar@ybl&pn=GROMART&am=${totalAmount}&cu=INR&tn=Order%20${orderId}`;
         window.location.href = upiUrl;
       }
@@ -90,9 +89,21 @@ const Checkout: React.FC = () => {
         className="w-full mb-3 p-2 border rounded"
       >
         <option value="UPI">UPI (PhonePe / GPay)</option>
-        <option value="COD" disabled>
-          Cash on Delivery (Coming Soon)
-        </option>
+        <option value="COD" disabled>Cash on Delivery (Coming Soon)</option>
       </select>
 
-      <div className="summary
+      <div className="summary mb-4">
+        <h3 className="font-semibold">Total: ₹{totalAmount}</h3>
+      </div>
+
+      <button
+        onClick={handlePlaceOrder}
+        className="bg-green-600 text-white w-full py-2 rounded hover:bg-green-700"
+      >
+        Place Order
+      </button>
+    </div>
+  );
+};
+
+export default Checkout;
