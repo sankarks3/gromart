@@ -58,7 +58,7 @@ app.post('/api/send-email', async (req, res) => {
   try {
     const emailResponse = await resend.emails.send({
       from: 'onboarding@resend.dev',
-      to: 'sankar.bca.2011@gmail.com',
+      to: 'test@resend.dev',  // ✅ Test email
       subject: `New Order - ${orderId}`,
       html: emailBodyHtml,
     });
