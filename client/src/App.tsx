@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import StoreDashboard from './pages/StoreDashboard';
 import StoreOrders from './pages/StoreOrders';
 import StoreProducts from './pages/StoreProducts';
+import OrderConfirmation from './pages/OrderConfirmation'; // ✅ Added missing import
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -44,6 +45,7 @@ function AppRoutes() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/order-confirmation" element={<OrderConfirmation />} />
       </Routes>
     </Layout>
   );
